@@ -55,7 +55,7 @@
             </thead>
             <tbody id="tasksTable"></tbody>
         </table>
-        
+
         <div id="taskInfo" class="task-info">
             <h2>Информация о задаче</h2>
             <div id="taskInfoContent"></div>
@@ -66,10 +66,10 @@
         $(document).ready(function() {
             fetchTasks();
         });
-
+    
         function fetchTasks() {
             $.ajax({
-                url: "http://185.204.0.141:8080/api/tasks",
+                url: "https://card-api.interparts.ru/api/tasks",
                 method: "GET",
                 dataType: "json",
                 success: function(response) {
@@ -102,10 +102,10 @@
                 }
             });
         }
-
+    
         function fetchTaskInfo(taskId, mongoId,  taskRowId) {
             $.ajax({
-                url: "http://185.204.0.141:8080/api/OzonApi/product/import/info",
+                url: "https://card-api.interparts.ru/api/OzonApi/product/import/info",
                 method: "POST",
                 contentType: "application/json",
                 data: JSON.stringify({ taskId: taskId }),
@@ -115,7 +115,7 @@
                         let infoHtml = "";
                         const result = response.result.result;
                         var latestStatus = "Не указан";
-
+    
                         if (result.items && result.items.length > 0) {
                             result.items.forEach(item => {
                                 latestStatus = item.status;
@@ -131,16 +131,16 @@
                         } else {
                             infoHtml = "Нет данных о задаче.";
                         }
-
+    
                         // Обновление статуса в таблице
                         $(`#status_${taskRowId}`).text(latestStatus);
                         $(`#checkTime_${taskRowId}`).text(new Date().toLocaleString());
-
+    
                         updateTaskStatus(taskRowId, latestStatus);
-
+    
                         // Запрос JSON по Mongo ID
                         $.ajax({
-                            url: `http://185.204.0.141:8080/api/dynamic/CardsData/${mongoId}`,
+                            url: `https://card-api.interparts.ru/api/dynamic/CardsData/${mongoId}`,
                             method: "GET",
                             dataType: "json",
                             success: function(jsonResponse) {
@@ -157,7 +157,7 @@
                                 $("#taskInfo").show();
                             }
                         });
-
+    
                     } else {
                         console.error("Ошибка получения информации о задаче", response.message);
                     }
@@ -167,14 +167,14 @@
                 }
             });
         }
-
+    
         function sendEditedJson(mongoId) {
             const editedJson = $("#jsonEditor").val();
             
             try {
                 const parsedJson = JSON.parse(editedJson);
                 $.ajax({
-                    url: `http://185.204.0.141:8080/api/dynamic/CardsData/${mongoId}`,
+                    url: `https://card-api.interparts.ru/api/dynamic/CardsData/${mongoId}`,
                     method: "PUT",
                     contentType: "application/json",
                     data: JSON.stringify(parsedJson),
@@ -190,7 +190,7 @@
                 var taskId;
                 // Отправляем запрос
                 $.ajax({
-                    url: "http://185.204.0.141:8080/api/OzonApi/product-import",
+                    url: "https://card-api.interparts.ru/api/OzonApi/product-import",
                     method: "POST",
                     contentType: "application/json",
                     data: JSON.stringify(parsedJson),
@@ -205,9 +205,9 @@
                                     ozonClient: 482702,
                                     lastStatus: "Создан"
                                 };
-
+    
                          $.ajax({
-                                    url: "http://185.204.0.141:8080/api/tasks",
+                                    url: "@ttps://card-api.interparts.ru/api/tasks",
                                     method: "POST",
                                     contentType: "application/json",
                                     data: JSON.stringify(taskData),
@@ -231,12 +231,12 @@
                 alert("Ошибка: Некорректный JSON");
             }
         }
-
-
+    
+    
         function deleteTask(taskId) {
             if (confirm("Вы уверены, что хотите удалить задачу?")) {
                 $.ajax({
-                    url: `http://185.204.0.141:8080/api/tasks/${taskId}`,
+                    url: `https://card-api.interparts.ru/api/tasks/${taskId}`,
                     method: "DELETE",
                     success: function() {
                         $(`#taskRow_${taskId}`).remove();
@@ -247,16 +247,16 @@
                 });
             }
         }
-
-
+    
+    
         function updateTaskStatus(taskId, newStatus) {
             const requestBody = {
                 lastStatus: newStatus,
                 checkTime: new Date().toISOString() // Текущая дата и время в формате ISO
             };
-
+    
             $.ajax({
-                url: `http://185.204.0.141:8080/api/tasks/${taskId}`,
+                url: `https://card-api.interparts.ru/api/tasks/${taskId}`,
                 method: "PUT",
                 contentType: "application/json",
                 data: JSON.stringify(requestBody),

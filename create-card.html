@@ -29,7 +29,7 @@
                 }
                 
                 $.ajax({
-                    url: `http://185.204.0.141:8080/api/Category/find-by-type-name/${typeName}`,
+                    url: `https://card-api.interparts.ru/api/Category/find-by-type-name/${typeName}`,
                     method: "GET",
                     dataType: "json",
                     success: function(response) {
@@ -78,7 +78,7 @@
             
             function loadCategoryAttributes(typeId, descriptionCategoryId) {
                 $.ajax({
-                    url: "http://185.204.0.141:8080/api/OzonApi/description-category-attributes",
+                    url: "https://card-api.interparts.ru/api/OzonApi/description-category-attributes",
                     method: "POST",
                     contentType: "application/json",
                     data: JSON.stringify({
@@ -184,8 +184,6 @@
                     <button id="create-product">Создать карточку</button><br>
                 `;
 
-
-
                 return html;
             }
 
@@ -193,17 +191,14 @@
             $(document).on("click", "#create-product", function() {
                 let attributes = [];
                 
-                
                 var productData = generateProductData();
                 console.log(productData)
-
-              
 
                 console.log(productData)
 
                 // Отправляем запрос
                 $.ajax({
-                    url: "http://185.204.0.141:8080/api/OzonApi/product-import",
+                    url: "https://card-api.interparts.ru/api/OzonApi/product-import",
                     method: "POST",
                     contentType: "application/json",
                     data: JSON.stringify(productData),
@@ -214,7 +209,7 @@
 
                         // Вызываем /api/dynamic/{collectionName}
                         $.ajax({
-                            url: `http://185.204.0.141:8080/api/dynamic/CardsData`, // подставь нужное название коллекции
+                            url: `https://card-api.interparts.ru/api/dynamic/CardsData`,
                             method: "POST",
                             contentType: "application/json",
                             data: JSON.stringify(productData),
@@ -225,14 +220,14 @@
                                 // Вызываем /api/tasks с телом
                                 const taskData = {
                                     taskId: response.result.result.taskId,
-                                    mongoId: dynamicResponse.result, // предполагаем, что mongoId приходит в поле result
-                                    name: $("#typeName").val(), // подставь нужное название
+                                    mongoId: dynamicResponse.result,
+                                    name: $("#typeName").val(),
                                     ozonClient: 482702,
                                     lastStatus: "Создан"
                                 };
 
                                 $.ajax({
-                                    url: "http://185.204.0.141:8080/api/tasks",
+                                    url: "https://card-api.interparts.ru/api/tasks",
                                     method: "POST",
                                     contentType: "application/json",
                                     data: JSON.stringify(taskData),
@@ -255,12 +250,11 @@
                         console.error("Ошибка создания карточки:", error);
                     }
                 });
-
             });
 
             function loadAttributeValues(attributeId, typeId, descriptionCategoryId, dictionaryId, parentHtml) {
                 $.ajax({
-                    url: "http://185.204.0.141:8080/api/OzonApi/description-category-attribute-values",
+                    url: "https://card-api.interparts.ru/api/OzonApi/description-category-attribute-values",
                     method: "POST",
                     contentType: "application/json",
                     data: JSON.stringify({
@@ -284,28 +278,22 @@
                                 valuesHtml += `<li class="${listItemClass}" style="${listItemStyle}" data-attribute-id="${attributeId}">${val.value}</li>`;
                             });
 
-                            // Если значений больше 10, добавляем кнопку "Развернуть"
                             if (values.length > 10) {
                                 valuesHtml += `<li class="show-more" style="color: blue; cursor: pointer;">Развернуть</li>`;
                             }
 
                             valuesHtml += "</ul>";
 
-                            // Вставляем значения атрибутов под нужный атрибут
                             $(parentHtml).append(valuesHtml);
 
-                            // Обработчик клика для раскрытия списка
                             $(parentHtml).find(".show-more").on("click", function() {
                                 $(parentHtml).find(".hidden-value").slideToggle();
-                                $(this).remove(); // Удаляем кнопку после клика
+                                $(this).remove();
                             });
 
-                            // Обработчик клика по элементу списка
                             $(parentHtml).find("li[data-attribute-id]").on("click", function() {
                                 let selectedValue = $(this).text();
                                 let attributeId = $(this).data("attribute-id");
-
-                                // Находим соответствующее поле ввода и вставляем значение
                                 $(`input.attribute-value[data-attribute-id="${attributeId}"]`).val(selectedValue);
                             });
 
@@ -370,7 +358,6 @@
             return productData;
         }
         
-        // Обработчик для динамически созданной кнопки
         $(document).on("click", "#load-data", function() {
             let mongoId = $("#mongoId").val().trim();
             console.log(mongoId);
@@ -379,9 +366,8 @@
                 return;
             }
             
-
             $.ajax({
-                url: `http://185.204.0.141:8080/api/dynamic/CardsData/${mongoId}`,
+                url: `https://card-api.interparts.ru/api/dynamic/CardsData/${mongoId}`,
                 method: "GET",
                 dataType: "json",
                 success: function(jsonResponse) {
@@ -407,7 +393,6 @@
                         $("#product-images360").val((item.images360 || []).join(", "));
                         $("#product-pdfList").val((item.pdf_list || []).join(", "));
 
-                        // Заполнение полей атрибутов
                         if (item.attributes && item.attributes.length > 0) {
                             item.attributes.forEach(attr => {
                                 let inputField = $(`input.attribute-value[data-attribute-id='${attr.id}']`);
@@ -427,7 +412,6 @@
                 }
             });
         });
-
     </script>
 </body>
 </html>
